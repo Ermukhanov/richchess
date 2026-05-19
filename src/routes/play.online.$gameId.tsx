@@ -125,10 +125,10 @@ function OnlineGame() {
       reason = result === "win" ? t("youWon") : t("youLost");
     }
     setOver({ result, reason });
-    if (!savedRef.current && user && String(color) !== "spectator") {
+    if (!savedRef.current && user && (color as string) !== "spectator") {
       savedRef.current = true;
       const eloDelta = result === "win" ? 20 : result === "loss" ? -15 : 0;
-      const opp = players.find((p) => p.user_id !== user.id && p.String(color) !== "spectator");
+      const opp = players.find((p) => p.user_id !== user.id && (p.color as string) !== "spectator");
       supabase.from("games").insert({
         white_player_id: color === "w" ? user.id : opp?.user_id ?? null,
         black_player_id: color === "b" ? user.id : opp?.user_id ?? null,
@@ -143,7 +143,7 @@ function OnlineGame() {
   }, [fen, over, chess, color, user, players, bet, tc, t]);
 
   const resign = () => {
-    if (!color || String(color) === "spectator" || over) return;
+    if (!color || (color as string) === "spectator" || over) return;
     if (!confirm("Resign and forfeit your bet?")) return;
     channelRef.current?.send({ type: "broadcast", event: "resign", payload: { color } });
     setOver({ result: "loss", reason: t("youLost") });
@@ -155,10 +155,10 @@ function OnlineGame() {
     toast.success("Link copied — share with your opponent");
   };
 
-  const myTurn = String(color) !== "spectator" && color === chess.turn();
+  const myTurn = (color as string) !== "spectator" && color === chess.turn();
   const orientation = color === "b" ? "black" : "white";
-  const opp = players.find((p) => p.user_id !== user?.id && p.String(color) !== "spectator");
-  const waiting = String(color) !== "spectator" && players.filter((p) => p.String(color) !== "spectator").length < 2;
+  const opp = players.find((p) => p.user_id !== user?.id && (p.color as string) !== "spectator");
+  const waiting = (color as string) !== "spectator" && players.filter((p) => (p.color as string) !== "spectator").length < 2;
 
   return (
     <AppShell>
@@ -182,12 +182,12 @@ function OnlineGame() {
                 <span className="flex items-center gap-1">
                   <Crown className="h-3 w-3 text-destructive" /> {opp?.username ?? "Waiting..."}
                 </span>
-                <span>{String(color) === "spectator" ? "Spectator mode" : myTurn && !over ? t("yourTurn") : ""}</span>
+                <span>{(color as string) === "spectator" ? "Spectator mode" : myTurn && !over ? t("yourTurn") : ""}</span>
               </div>
               <ChessGame
                 externalChess={chess}
                 fen={fen}
-                disabled={!myTurn || !!over || waiting || String(color) === "spectator"}
+                disabled={!myTurn || !!over || waiting || (color as string) === "spectator"}
                 theme={(profile?.board_theme as any) ?? "wall_street"}
                 lastMove={lastMove}
                 orientation={orientation}
@@ -200,7 +200,7 @@ function OnlineGame() {
               </div>
             </div>
 
-            {waiting && String(color) !== "spectator" && (
+            {waiting && (color as string) !== "spectator" && (
               <div className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl">
                 <div className="bg-card border border-gold rounded-xl p-6 text-center max-w-sm">
                   <div className="text-4xl mb-2">🤝</div>
@@ -230,7 +230,7 @@ function OnlineGame() {
               activeColor={chess.turn()}
               running={!over && !waiting && history.length > 0}
               onFlag={(c) => {
-                if (over || String(color) === "spectator") return;
+                if (over || (color as string) === "spectator") return;
                 setOver({ result: c === color ? "loss" : "win", reason: c === color ? t("youLost") : t("youWon") });
               }}
               label={{ w: "White", b: "Black" }}
@@ -248,7 +248,7 @@ function OnlineGame() {
                 ))}
               </div>
             </div>
-            {String(color) !== "spectator" && (
+            {(color as string) !== "spectator" && (
               <Button variant="outline" onClick={resign}>{t("resign")}</Button>
             )}
           </aside>

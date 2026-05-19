@@ -212,7 +212,7 @@ function HostileGame() {
   const myTurn = myCorp === currentCorp;
 
   const onCellClick = (r: number, c: number) => {
-    if (over || !myTurn || myCorp === "spectator") return;
+    if (over || !myTurn || (myCorp as string) === "spectator") return;
     const cell = board[r][c];
     if (sel) {
       const moves = legalMoves(board, sel[0], sel[1]);
