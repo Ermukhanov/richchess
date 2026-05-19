@@ -20,6 +20,7 @@ import { Route as CommunityRouteImport } from './routes/community'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as PlayAiRouteImport } from './routes/play.ai'
+import { Route as PlayOnlineGameIdRouteImport } from './routes/play.online.$gameId'
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
@@ -76,6 +77,11 @@ const PlayAiRoute = PlayAiRouteImport.update({
   path: '/ai',
   getParentRoute: () => PlayRoute,
 } as any)
+const PlayOnlineGameIdRoute = PlayOnlineGameIdRouteImport.update({
+  id: '/online/$gameId',
+  path: '/online/$gameId',
+  getParentRoute: () => PlayRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -89,6 +95,7 @@ export interface FileRoutesByFullPath {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,6 +109,7 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -116,6 +124,7 @@ export interface FileRoutesById {
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -131,6 +140,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play/online/$gameId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,6 +154,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play/online/$gameId'
   id:
     | '__root__'
     | '/'
@@ -157,6 +168,7 @@ export interface FileRouteTypes {
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play/online/$gameId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -251,15 +263,24 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlayAiRouteImport
       parentRoute: typeof PlayRoute
     }
+    '/play/online/$gameId': {
+      id: '/play/online/$gameId'
+      path: '/online/$gameId'
+      fullPath: '/play/online/$gameId'
+      preLoaderRoute: typeof PlayOnlineGameIdRouteImport
+      parentRoute: typeof PlayRoute
+    }
   }
 }
 
 interface PlayRouteChildren {
   PlayAiRoute: typeof PlayAiRoute
+  PlayOnlineGameIdRoute: typeof PlayOnlineGameIdRoute
 }
 
 const PlayRouteChildren: PlayRouteChildren = {
   PlayAiRoute: PlayAiRoute,
+  PlayOnlineGameIdRoute: PlayOnlineGameIdRoute,
 }
 
 const PlayRouteWithChildren = PlayRoute._addFileChildren(PlayRouteChildren)
