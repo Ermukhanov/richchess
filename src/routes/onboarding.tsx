@@ -113,16 +113,7 @@ function Onboarding() {
                 <Button variant="ghost" onClick={skip} className="w-full mt-4 text-muted-foreground">{t("skip")}</Button>
               </div>
             )}
-            {step === 2 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-4">{t("yourCity")}</h2>
-                <Input autoFocus value={data.city} onChange={(e) => setData({ ...data, city: e.target.value })} placeholder="Almaty, Moscow, NYC..." />
-                <div className="flex gap-2 mt-4">
-                  <Button variant="ghost" onClick={skip} className="flex-1">{t("skip")}</Button>
-                  <Button onClick={next} className="flex-1">{t("next")}</Button>
-                </div>
-              </div>
-            )}
+            {step === 2 && <CityStep data={data} setData={setData} next={next} skip={skip} t={t} />}
             {step === 3 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">{t("chooseLanguage")}</h2>
