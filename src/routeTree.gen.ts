@@ -74,9 +74,9 @@ const PlayIndexRoute = PlayIndexRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlayAiRoute = PlayAiRouteImport.update({
-  id: '/ai',
-  path: '/ai',
-  getParentRoute: () => PlayRoute,
+  id: '/play/ai',
+  path: '/play/ai',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PlayOnlineGameIdRoute = PlayOnlineGameIdRouteImport.update({
   id: '/play/online/$gameId',
@@ -193,6 +193,7 @@ export interface RootRouteChildren {
   OnboardingRoute: typeof OnboardingRoute
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
+  PlayAiRoute: typeof PlayAiRoute
   PlayIndexRoute: typeof PlayIndexRoute
   PlayHostileGameIdRoute: typeof PlayHostileGameIdRoute
   PlayOnlineGameIdRoute: typeof PlayOnlineGameIdRoute
@@ -272,10 +273,10 @@ declare module '@tanstack/react-router' {
     }
     '/play/ai': {
       id: '/play/ai'
-      path: '/ai'
+      path: '/play/ai'
       fullPath: '/play/ai'
       preLoaderRoute: typeof PlayAiRouteImport
-      parentRoute: typeof PlayRoute
+      parentRoute: typeof rootRouteImport
     }
     '/play/online/$gameId': {
       id: '/play/online/$gameId'
@@ -304,6 +305,7 @@ const rootRouteChildren: RootRouteChildren = {
   OnboardingRoute: OnboardingRoute,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
+  PlayAiRoute: PlayAiRoute,
   PlayIndexRoute: PlayIndexRoute,
   PlayHostileGameIdRoute: PlayHostileGameIdRoute,
   PlayOnlineGameIdRoute: PlayOnlineGameIdRoute,
@@ -311,13 +313,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
