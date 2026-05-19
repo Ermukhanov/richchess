@@ -1,9 +1,10 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
 import { Home, Swords, BookOpen, Trophy, Users, User, Settings, Crown, LogOut, Briefcase } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import { ProModal } from "@/components/ProModal";
 import { cn } from "@/lib/utils";
 
 export function AppShell({ children }: { children: ReactNode }) {
@@ -11,6 +12,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const { profile, signOut } = useAuth();
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const [proOpen, setProOpen] = useState(false);
 
   const nav = [
     { to: "/dashboard", label: t("home"), icon: Home },
@@ -65,7 +67,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="mt-4 space-y-2">
-          <Button variant="default" className="w-full font-semibold">
+          <Button variant="default" className="w-full font-semibold" onClick={() => setProOpen(true)}>
             <Crown className="h-4 w-4 mr-2" /> {t("goPro")}
           </Button>
           {profile && (
@@ -98,6 +100,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
+      <ProModal open={proOpen} onOpenChange={setProOpen} />
     </div>
   );
 }
