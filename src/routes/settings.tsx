@@ -65,7 +65,7 @@ function SettingsPage() {
       corporate_budget: profile.corporate_budget - s.cost,
     }).eq("id", user.id);
     await refreshProfile();
-    toast.success(`${s.label} unlocked`);
+    toast.success(`Skin unlocked`);
   };
 
   if (!profile) return <AppShell><div className="p-8">{t("loading")}</div></AppShell>;
