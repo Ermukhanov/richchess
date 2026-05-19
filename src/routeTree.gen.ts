@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ProfileRouteImport } from './routes/profile'
-import { Route as PlayRouteImport } from './routes/play'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LearnRouteImport } from './routes/learn'
 import { Route as LeaderboardRouteImport } from './routes/leaderboard'
@@ -19,6 +18,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CommunityRouteImport } from './routes/community'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as PlayIndexRouteImport } from './routes/play.index'
 import { Route as PlayAiRouteImport } from './routes/play.ai'
 import { Route as PlayOnlineGameIdRouteImport } from './routes/play.online.$gameId'
 import { Route as PlayHostileGameIdRouteImport } from './routes/play.hostile.$gameId'
@@ -31,11 +31,6 @@ const SettingsRoute = SettingsRouteImport.update({
 const ProfileRoute = ProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const PlayRoute = PlayRouteImport.update({
-  id: '/play',
-  path: '/play',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -73,20 +68,25 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlayIndexRoute = PlayIndexRouteImport.update({
+  id: '/play/',
+  path: '/play/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PlayAiRoute = PlayAiRouteImport.update({
   id: '/ai',
   path: '/ai',
   getParentRoute: () => PlayRoute,
 } as any)
 const PlayOnlineGameIdRoute = PlayOnlineGameIdRouteImport.update({
-  id: '/online/$gameId',
-  path: '/online/$gameId',
-  getParentRoute: () => PlayRoute,
+  id: '/play/online/$gameId',
+  path: '/play/online/$gameId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const PlayHostileGameIdRoute = PlayHostileGameIdRouteImport.update({
-  id: '/hostile/$gameId',
-  path: '/hostile/$gameId',
-  getParentRoute: () => PlayRoute,
+  id: '/play/hostile/$gameId',
+  path: '/play/hostile/$gameId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -97,10 +97,10 @@ export interface FileRoutesByFullPath {
   '/leaderboard': typeof LeaderboardRoute
   '/learn': typeof LearnRoute
   '/onboarding': typeof OnboardingRoute
-  '/play': typeof PlayRouteWithChildren
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play/': typeof PlayIndexRoute
   '/play/hostile/$gameId': typeof PlayHostileGameIdRoute
   '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
@@ -112,10 +112,10 @@ export interface FileRoutesByTo {
   '/leaderboard': typeof LeaderboardRoute
   '/learn': typeof LearnRoute
   '/onboarding': typeof OnboardingRoute
-  '/play': typeof PlayRouteWithChildren
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play': typeof PlayIndexRoute
   '/play/hostile/$gameId': typeof PlayHostileGameIdRoute
   '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
@@ -128,10 +128,10 @@ export interface FileRoutesById {
   '/leaderboard': typeof LeaderboardRoute
   '/learn': typeof LearnRoute
   '/onboarding': typeof OnboardingRoute
-  '/play': typeof PlayRouteWithChildren
   '/profile': typeof ProfileRoute
   '/settings': typeof SettingsRoute
   '/play/ai': typeof PlayAiRoute
+  '/play/': typeof PlayIndexRoute
   '/play/hostile/$gameId': typeof PlayHostileGameIdRoute
   '/play/online/$gameId': typeof PlayOnlineGameIdRoute
 }
@@ -145,10 +145,10 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/learn'
     | '/onboarding'
-    | '/play'
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play/'
     | '/play/hostile/$gameId'
     | '/play/online/$gameId'
   fileRoutesByTo: FileRoutesByTo
@@ -160,10 +160,10 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/learn'
     | '/onboarding'
-    | '/play'
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play'
     | '/play/hostile/$gameId'
     | '/play/online/$gameId'
   id:
@@ -175,10 +175,10 @@ export interface FileRouteTypes {
     | '/leaderboard'
     | '/learn'
     | '/onboarding'
-    | '/play'
     | '/profile'
     | '/settings'
     | '/play/ai'
+    | '/play/'
     | '/play/hostile/$gameId'
     | '/play/online/$gameId'
   fileRoutesById: FileRoutesById
@@ -191,9 +191,11 @@ export interface RootRouteChildren {
   LeaderboardRoute: typeof LeaderboardRoute
   LearnRoute: typeof LearnRoute
   OnboardingRoute: typeof OnboardingRoute
-  PlayRoute: typeof PlayRouteWithChildren
   ProfileRoute: typeof ProfileRoute
   SettingsRoute: typeof SettingsRoute
+  PlayIndexRoute: typeof PlayIndexRoute
+  PlayHostileGameIdRoute: typeof PlayHostileGameIdRoute
+  PlayOnlineGameIdRoute: typeof PlayOnlineGameIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -210,13 +212,6 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof ProfileRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/play': {
-      id: '/play'
-      path: '/play'
-      fullPath: '/play'
-      preLoaderRoute: typeof PlayRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -268,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/play/': {
+      id: '/play/'
+      path: '/play'
+      fullPath: '/play/'
+      preLoaderRoute: typeof PlayIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/play/ai': {
       id: '/play/ai'
       path: '/ai'
@@ -277,34 +279,20 @@ declare module '@tanstack/react-router' {
     }
     '/play/online/$gameId': {
       id: '/play/online/$gameId'
-      path: '/online/$gameId'
+      path: '/play/online/$gameId'
       fullPath: '/play/online/$gameId'
       preLoaderRoute: typeof PlayOnlineGameIdRouteImport
-      parentRoute: typeof PlayRoute
+      parentRoute: typeof rootRouteImport
     }
     '/play/hostile/$gameId': {
       id: '/play/hostile/$gameId'
-      path: '/hostile/$gameId'
+      path: '/play/hostile/$gameId'
       fullPath: '/play/hostile/$gameId'
       preLoaderRoute: typeof PlayHostileGameIdRouteImport
-      parentRoute: typeof PlayRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
-
-interface PlayRouteChildren {
-  PlayAiRoute: typeof PlayAiRoute
-  PlayHostileGameIdRoute: typeof PlayHostileGameIdRoute
-  PlayOnlineGameIdRoute: typeof PlayOnlineGameIdRoute
-}
-
-const PlayRouteChildren: PlayRouteChildren = {
-  PlayAiRoute: PlayAiRoute,
-  PlayHostileGameIdRoute: PlayHostileGameIdRoute,
-  PlayOnlineGameIdRoute: PlayOnlineGameIdRoute,
-}
-
-const PlayRouteWithChildren = PlayRoute._addFileChildren(PlayRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -314,10 +302,22 @@ const rootRouteChildren: RootRouteChildren = {
   LeaderboardRoute: LeaderboardRoute,
   LearnRoute: LearnRoute,
   OnboardingRoute: OnboardingRoute,
-  PlayRoute: PlayRouteWithChildren,
   ProfileRoute: ProfileRoute,
   SettingsRoute: SettingsRoute,
+  PlayIndexRoute: PlayIndexRoute,
+  PlayHostileGameIdRoute: PlayHostileGameIdRoute,
+  PlayOnlineGameIdRoute: PlayOnlineGameIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
