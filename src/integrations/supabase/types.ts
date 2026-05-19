@@ -14,7 +14,108 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      games: {
+        Row: {
+          ai_analysis: Json | null
+          ai_difficulty: string | null
+          black_player_id: string | null
+          created_at: string
+          game_mode: string | null
+          id: string
+          pgn: string | null
+          result: string | null
+          time_control: string | null
+          white_player_id: string | null
+        }
+        Insert: {
+          ai_analysis?: Json | null
+          ai_difficulty?: string | null
+          black_player_id?: string | null
+          created_at?: string
+          game_mode?: string | null
+          id?: string
+          pgn?: string | null
+          result?: string | null
+          time_control?: string | null
+          white_player_id?: string | null
+        }
+        Update: {
+          ai_analysis?: Json | null
+          ai_difficulty?: string | null
+          black_player_id?: string | null
+          created_at?: string
+          game_mode?: string | null
+          id?: string
+          pgn?: string | null
+          result?: string | null
+          time_control?: string | null
+          white_player_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "games_black_player_id_fkey"
+            columns: ["black_player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "games_white_player_id_fkey"
+            columns: ["white_player_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          city: string | null
+          company_title: string | null
+          corporate_budget: number
+          country: string | null
+          created_at: string
+          elo_rating: number
+          email: string | null
+          id: string
+          language: string
+          onboarded: boolean
+          updated_at: string
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          city?: string | null
+          company_title?: string | null
+          corporate_budget?: number
+          country?: string | null
+          created_at?: string
+          elo_rating?: number
+          email?: string | null
+          id: string
+          language?: string
+          onboarded?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          city?: string | null
+          company_title?: string | null
+          corporate_budget?: number
+          country?: string | null
+          created_at?: string
+          elo_rating?: number
+          email?: string | null
+          id?: string
+          language?: string
+          onboarded?: boolean
+          updated_at?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
