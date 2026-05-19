@@ -14,42 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
+      achievements: {
+        Row: {
+          awarded_at: string
+          code: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          awarded_at?: string
+          code: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          awarded_at?: string
+          code?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          created_at: string
+          game_id: string
+          id: string
+          message: string
+          user_id: string
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          game_id: string
+          id?: string
+          message: string
+          user_id: string
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          game_id?: string
+          id?: string
+          message?: string
+          user_id?: string
+          username?: string | null
+        }
+        Relationships: []
+      }
       games: {
         Row: {
           ai_analysis: Json | null
           ai_difficulty: string | null
+          bet: number
           black_player_id: string | null
           created_at: string
           game_mode: string | null
           id: string
           pgn: string | null
           result: string | null
+          time_black_ms: number | null
           time_control: string | null
+          time_white_ms: number | null
           white_player_id: string | null
+          winner_id: string | null
         }
         Insert: {
           ai_analysis?: Json | null
           ai_difficulty?: string | null
+          bet?: number
           black_player_id?: string | null
           created_at?: string
           game_mode?: string | null
           id?: string
           pgn?: string | null
           result?: string | null
+          time_black_ms?: number | null
           time_control?: string | null
+          time_white_ms?: number | null
           white_player_id?: string | null
+          winner_id?: string | null
         }
         Update: {
           ai_analysis?: Json | null
           ai_difficulty?: string | null
+          bet?: number
           black_player_id?: string | null
           created_at?: string
           game_mode?: string | null
           id?: string
           pgn?: string | null
           result?: string | null
+          time_black_ms?: number | null
           time_control?: string | null
+          time_white_ms?: number | null
           white_player_id?: string | null
+          winner_id?: string | null
         }
         Relationships: [
           {
@@ -68,51 +128,117 @@ export type Database = {
           },
         ]
       }
+      matchmaking_queue: {
+        Row: {
+          created_at: string
+          elo: number
+          id: string
+          time_control: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          elo: number
+          id?: string
+          time_control: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          elo?: number
+          id?: string
+          time_control?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          best_win_streak: number
+          board_theme: string
+          cb_earned: number
           city: string | null
           company_title: string | null
           corporate_budget: number
           country: string | null
           created_at: string
+          current_win_streak: number
+          draws: number
           elo_rating: number
           email: string | null
           id: string
+          is_pro: boolean
           language: string
+          last_login_date: string | null
+          lessons_completed: Json
+          losses: number
           onboarded: boolean
+          piece_skin: string
+          streak_days: number
+          unlocked_skins: Json
           updated_at: string
           username: string | null
+          wins: number
+          xp: number
         }
         Insert: {
           avatar_url?: string | null
+          best_win_streak?: number
+          board_theme?: string
+          cb_earned?: number
           city?: string | null
           company_title?: string | null
           corporate_budget?: number
           country?: string | null
           created_at?: string
+          current_win_streak?: number
+          draws?: number
           elo_rating?: number
           email?: string | null
           id: string
+          is_pro?: boolean
           language?: string
+          last_login_date?: string | null
+          lessons_completed?: Json
+          losses?: number
           onboarded?: boolean
+          piece_skin?: string
+          streak_days?: number
+          unlocked_skins?: Json
           updated_at?: string
           username?: string | null
+          wins?: number
+          xp?: number
         }
         Update: {
           avatar_url?: string | null
+          best_win_streak?: number
+          board_theme?: string
+          cb_earned?: number
           city?: string | null
           company_title?: string | null
           corporate_budget?: number
           country?: string | null
           created_at?: string
+          current_win_streak?: number
+          draws?: number
           elo_rating?: number
           email?: string | null
           id?: string
+          is_pro?: boolean
           language?: string
+          last_login_date?: string | null
+          lessons_completed?: Json
+          losses?: number
           onboarded?: boolean
+          piece_skin?: string
+          streak_days?: number
+          unlocked_skins?: Json
           updated_at?: string
           username?: string | null
+          wins?: number
+          xp?: number
         }
         Relationships: []
       }
@@ -121,7 +247,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      place_bet: { Args: { p_amount: number }; Returns: boolean }
+      settle_game: {
+        Args: { p_bet: number; p_elo_delta: number; p_result: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

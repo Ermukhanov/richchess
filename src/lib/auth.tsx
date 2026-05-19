@@ -14,6 +14,20 @@ export type Profile = {
   company_title: string | null;
   language: string;
   onboarded: boolean;
+  is_pro: boolean;
+  xp: number;
+  streak_days: number;
+  last_login_date: string | null;
+  lessons_completed: string[];
+  board_theme: string;
+  piece_skin: string;
+  unlocked_skins: string[];
+  wins: number;
+  losses: number;
+  draws: number;
+  best_win_streak: number;
+  current_win_streak: number;
+  cb_earned: number;
 };
 
 const AuthCtx = createContext<{

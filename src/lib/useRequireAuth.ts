@@ -7,7 +7,7 @@ import { useAuth } from "@/lib/auth";
  * and unboarded users to /onboarding.
  */
 export function useRequireAuth(requireOnboarded = true) {
-  const { user, profile, loading } = useAuth();
+  const { user, profile, loading, refreshProfile, signOut } = useAuth();
   const navigate = useNavigate();
   useEffect(() => {
     if (loading) return;
@@ -19,5 +19,5 @@ export function useRequireAuth(requireOnboarded = true) {
       navigate({ to: "/onboarding" });
     }
   }, [user, profile, loading, requireOnboarded, navigate]);
-  return { user, profile, loading };
+  return { user, profile, loading, refreshProfile, signOut };
 }
