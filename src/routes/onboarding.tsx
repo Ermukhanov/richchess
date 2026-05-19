@@ -9,6 +9,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
+import { KZ_CITIES_UNIQUE } from "@/lib/kz-cities";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
 
 export const Route = createFileRoute("/onboarding")({ component: Onboarding });
 
@@ -109,16 +113,7 @@ function Onboarding() {
                 <Button variant="ghost" onClick={skip} className="w-full mt-4 text-muted-foreground">{t("skip")}</Button>
               </div>
             )}
-            {step === 2 && (
-              <div>
-                <h2 className="text-2xl font-bold mb-4">{t("yourCity")}</h2>
-                <Input autoFocus value={data.city} onChange={(e) => setData({ ...data, city: e.target.value })} placeholder="Almaty, Moscow, NYC..." />
-                <div className="flex gap-2 mt-4">
-                  <Button variant="ghost" onClick={skip} className="flex-1">{t("skip")}</Button>
-                  <Button onClick={next} className="flex-1">{t("next")}</Button>
-                </div>
-              </div>
-            )}
+            {step === 2 && <CityStep data={data} setData={setData} next={next} skip={skip} t={t} />}
             {step === 3 && (
               <div>
                 <h2 className="text-2xl font-bold mb-4">{t("chooseLanguage")}</h2>
@@ -200,6 +195,51 @@ function Onboarding() {
         {step < 5 && (
           <p className="text-center text-xs text-muted-foreground mt-4">{step + 1} / 5</p>
         )}
+      </div>
+    </div>
+  );
+}
+
+function CityStep({ data, setData, next, skip, t }: any) {
+  const [open, setOpen] = useState(false);
+  const [custom, setCustom] = useState(false);
+  return (
+    <div>
+      <h2 className="text-2xl font-bold mb-4">{t("yourCity")}</h2>
+      {!custom ? (
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button variant="outline" role="combobox" className="w-full justify-between font-normal">
+              {data.city || "Выберите город..."}
+              <ChevronsUpDown className="ml-2 h-4 w-4 opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+            <Command>
+              <CommandInput placeholder="Поиск города..." />
+              <CommandList>
+                <CommandEmpty>Не найдено.</CommandEmpty>
+                <CommandGroup>
+                  {KZ_CITIES_UNIQUE.map((c) => (
+                    <CommandItem key={c} value={c} onSelect={() => { setData({ ...data, city: c }); setOpen(false); }}>
+                      <Check className={cn("mr-2 h-4 w-4", data.city === c ? "opacity-100" : "opacity-0")} />
+                      {c}
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      ) : (
+        <Input autoFocus value={data.city} onChange={(e) => setData({ ...data, city: e.target.value })} placeholder="Введите город..." />
+      )}
+      <button onClick={() => setCustom((c) => !c)} className="text-xs text-muted-foreground hover:text-gold mt-2">
+        {custom ? "← Выбрать из списка" : "Моего города нет в списке →"}
+      </button>
+      <div className="flex gap-2 mt-4">
+        <Button variant="ghost" onClick={skip} className="flex-1">{t("skip")}</Button>
+        <Button onClick={next} className="flex-1">{t("next")}</Button>
       </div>
     </div>
   );

@@ -9,7 +9,7 @@ import { Bot, Users, Swords, Share2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-export const Route = createFileRoute("/play")({ component: PlayPicker });
+export const Route = createFileRoute("/play/")({ component: PlayPicker });
 
 type Mode = "ai" | "friend" | "random" | "hostile";
 
