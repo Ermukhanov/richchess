@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/lib/i18n";
 import { useRequireAuth } from "@/lib/useRequireAuth";
 import { supabase } from "@/integrations/supabase/client";
+import skylineImg from "@/assets/skyline.jpg";
 
 export const Route = createFileRoute("/dashboard")({ component: Dashboard });
 
@@ -45,18 +46,22 @@ function Dashboard() {
   return (
     <AppShell>
       <div className="max-w-6xl mx-auto p-6 md:p-8 space-y-6">
-        {/* Welcome card */}
+        {/* Welcome hero card with image */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-card border border-border rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
+          className="relative overflow-hidden glass-gold rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
         >
-          <div>
+          <div className="absolute inset-0 -z-10 opacity-30">
+            <img src={skylineImg} alt="" width={1920} height={400} loading="eager" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 to-transparent" />
+          </div>
+          <div className="relative">
             <p className="text-sm text-muted-foreground">{t("goodMorning")},</p>
-            <h1 className="text-3xl font-bold">{profile.username ?? "Shark"} 🦈</h1>
+            <h1 className="text-3xl md:text-4xl font-bold">{profile.username ?? "Shark"} 🦈</h1>
             <p className="text-sm text-muted-foreground mt-1">{profile.company_title ?? "Executive"}</p>
           </div>
-          <div className="text-right">
+          <div className="relative text-right">
             <p className="text-xs uppercase tracking-wider text-muted-foreground">{t("corporateBudget")}</p>
             <p className="text-3xl font-bold text-gradient-gold font-mono">${profile.corporate_budget.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-1">ELO {profile.elo_rating}</p>

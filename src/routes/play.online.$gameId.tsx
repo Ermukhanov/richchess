@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ChessGame } from "@/components/ChessGame";
 import { ChessClock, parseTimeControl } from "@/components/ChessClock";
 import { ChatPanel } from "@/components/ChatPanel";
+import { LiveCoach } from "@/components/LiveCoach";
 import { useI18n } from "@/lib/i18n";
 import { useRequireAuth } from "@/lib/useRequireAuth";
 import { sanToCorporate } from "@/lib/pieces";
@@ -162,6 +163,9 @@ function OnlineGame() {
 
   return (
     <AppShell>
+      {color && (color as string) !== "spectator" && (
+        <LiveCoach chess={chess} fen={fen} history={history} playerColor={color as "w" | "b"} enabled={!over} />
+      )}
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         <div className="flex items-center justify-between mb-4">
           <Button asChild variant="ghost" size="sm">

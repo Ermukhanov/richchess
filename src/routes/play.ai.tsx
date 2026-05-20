@@ -4,11 +4,13 @@ import { z } from "zod";
 import { Chess } from "chess.js";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import { ArrowLeft, Crown, RotateCcw, Sparkles } from "lucide-react";
+import { ArrowLeft, Crown, RotateCcw, Sparkles, Lock } from "lucide-react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
 import { ChessGame } from "@/components/ChessGame";
 import { ChessClock, parseTimeControl } from "@/components/ChessClock";
+import { LiveCoach } from "@/components/LiveCoach";
+import { ProModal } from "@/components/ProModal";
 import { useI18n } from "@/lib/i18n";
 import { useRequireAuth } from "@/lib/useRequireAuth";
 import { getBestMove, type AiLevel } from "@/lib/stockfish";
@@ -16,6 +18,8 @@ import { sanToCorporate } from "@/lib/pieces";
 import { supabase } from "@/integrations/supabase/client";
 import { analyzeGame, askCoach } from "@/lib/ai-coach.functions";
 import { useServerFn } from "@tanstack/react-start";
+
+const FREE_AI_LIMIT = 5;
 
 const search = z.object({
   tc: z.string().optional().default("10+0"),
@@ -41,22 +45,50 @@ function AiGame() {
   const [analyzing, setAnalyzing] = useState(false);
   const [coachQ, setCoachQ] = useState("");
   const [coachA, setCoachA] = useState("");
+  const [quotaState, setQuotaState] = useState<"checking" | "ok" | "blocked">("checking");
+  const [remaining, setRemaining] = useState<number | null>(null);
+  const [proOpen, setProOpen] = useState(false);
   const savedRef = useRef(false);
   const analyze = useServerFn(analyzeGame);
   const ask = useServerFn(askCoach);
 
+  // Check / consume daily AI quota
+  const quotaRef = useRef(false);
+  useEffect(() => {
+    if (!user || quotaRef.current) return;
+    quotaRef.current = true;
+    supabase.rpc("consume_ai_game", { p_limit: FREE_AI_LIMIT }).then(({ data, error }) => {
+      if (error) {
+        setQuotaState("ok");
+        return;
+      }
+      const r = data as any;
+      if (r?.allowed) {
+        setQuotaState("ok");
+        setRemaining(r.remaining ?? null);
+        if (!r.pro && r.remaining !== undefined && r.remaining <= 2) {
+          toast(`${r.remaining} ${t("aiQuotaLeft")}`, { duration: 4500 });
+        }
+      } else {
+        setQuotaState("blocked");
+      }
+    });
+  }, [user, t]);
+
   const placeBetOnce = useRef(false);
   useEffect(() => {
+    if (quotaState !== "ok") return;
     if (bet > 0 && user && !placeBetOnce.current) {
       placeBetOnce.current = true;
       supabase.rpc("place_bet", { p_amount: bet }).then(({ data }) => {
         if (data === false) toast.error("Insufficient Corporate Budget");
       });
     }
-  }, [bet, user]);
+  }, [bet, user, quotaState]);
 
   // AI move on black's turn
   useEffect(() => {
+    if (quotaState !== "ok") return;
     if (over || chess.turn() !== "b" || chess.isGameOver()) return;
     let cancelled = false;
     setThinking(true);
@@ -80,9 +112,8 @@ function AiGame() {
     return () => {
       cancelled = true;
     };
-  }, [fen, over, level, chess]);
+  }, [fen, over, level, chess, quotaState]);
 
-  // Detect game over
   useEffect(() => {
     if (over || !chess.isGameOver()) return;
     let result: "win" | "loss" | "draw" = "draw";
@@ -142,8 +173,42 @@ function AiGame() {
 
   const reset = () => navigate({ to: "/play" });
 
+  if (quotaState === "checking") {
+    return (
+      <AppShell>
+        <div className="max-w-md mx-auto p-10 text-center text-muted-foreground">{t("loading")}</div>
+      </AppShell>
+    );
+  }
+
+  if (quotaState === "blocked") {
+    return (
+      <AppShell>
+        <div className="max-w-md mx-auto p-6 md:p-10">
+          <div className="glass-gold rounded-2xl p-8 text-center">
+            <Lock className="h-10 w-10 text-gold mx-auto mb-4" />
+            <h2 className="text-xl font-bold mb-2">{t("aiLimitReached")}</h2>
+            <p className="text-sm text-muted-foreground mb-6">
+              Free tier · {FREE_AI_LIMIT} {t("aiQuotaLeft").replace("left today", "/ day")}
+            </p>
+            <div className="flex gap-2 justify-center">
+              <Button onClick={() => setProOpen(true)} className="glow-gold font-semibold">
+                <Crown className="h-4 w-4 mr-1" /> {t("upgradeNow")}
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/dashboard">{t("backToDashboard")}</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
+        <ProModal open={proOpen} onOpenChange={setProOpen} />
+      </AppShell>
+    );
+  }
+
   return (
     <AppShell>
+      <LiveCoach chess={chess} fen={fen} history={history} playerColor="w" enabled={!over} />
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         <div className="flex items-center justify-between mb-4">
           <Button asChild variant="ghost" size="sm">
@@ -151,16 +216,21 @@ function AiGame() {
               <ArrowLeft className="h-4 w-4 mr-1" /> {t("backToDashboard")}
             </Link>
           </Button>
-          <div className="text-sm">
+          <div className="text-sm flex items-center gap-3">
+            {remaining !== null && remaining < 9999 && (
+              <span className="text-xs text-muted-foreground glass rounded-full px-2.5 py-1">
+                {remaining}/{FREE_AI_LIMIT} ИИ-партий
+              </span>
+            )}
             <span className="text-muted-foreground">vs </span>
             <span className="font-semibold text-gold capitalize">{level}</span>
-            {bet > 0 && <span className="ml-3 font-mono text-gold">${bet} CB</span>}
+            {bet > 0 && <span className="ml-1 font-mono text-gold">${bet} CB</span>}
           </div>
         </div>
 
         <div className="grid lg:grid-cols-[1fr,340px] gap-6">
           <div className="relative">
-            <div className="bg-card border border-border rounded-2xl p-3 md:p-4">
+            <div className="glass-gold rounded-2xl p-3 md:p-4">
               <div className="flex items-center justify-between text-xs uppercase tracking-wider text-muted-foreground mb-2 px-1">
                 <span className="flex items-center gap-1">
                   <Crown className="h-3 w-3 text-destructive" /> AI ({level})
@@ -187,9 +257,9 @@ function AiGame() {
               <motion.div
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm rounded-2xl"
+                className="absolute inset-0 flex items-center justify-center bg-background/80 backdrop-blur-md rounded-2xl"
               >
-                <div className="bg-card border border-gold rounded-xl p-6 text-center glow-gold max-w-sm">
+                <div className="glass-gold rounded-xl p-6 text-center glow-gold-strong max-w-sm">
                   <div className="text-4xl mb-2">{over.result === "win" ? "🏆" : over.result === "loss" ? "📉" : "🤝"}</div>
                   <h2 className="text-xl font-bold mb-2">{over.reason}</h2>
                   <div className="flex gap-2 mt-4">
@@ -205,7 +275,7 @@ function AiGame() {
             )}
           </div>
 
-          <aside className="bg-card border border-border rounded-2xl p-4 flex flex-col gap-4">
+          <aside className="glass rounded-2xl p-4 flex flex-col gap-4">
             <ChessClock
               initialMs={initialMs}
               incMs={incMs}

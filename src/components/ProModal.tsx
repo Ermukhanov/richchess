@@ -1,58 +1,67 @@
-import { Crown, Check, X } from "lucide-react";
+import { Crown, Check, X, Sparkles, Zap, Trophy, BarChart3, Palette } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 export function ProModal({ open, onOpenChange }: { open: boolean; onOpenChange: (o: boolean) => void }) {
   const features = [
-    { label: "Play vs AI", free: true, pro: true },
-    { label: "Multiplayer + 4-player", free: true, pro: true },
-    { label: "AI Coach analysis", free: "3 / month", pro: "Unlimited" },
-    { label: "Priority matchmaking", free: false, pro: true },
-    { label: "Diamond CEO skin", free: false, pro: true },
-    { label: "Stats export (CSV)", free: false, pro: true },
-    { label: "Ad-free experience", free: true, pro: true },
+    { icon: Zap, label: "AI games per day", free: "5", pro: "Unlimited" },
+    { icon: Sparkles, label: "Live AI Coach in-game", free: "—", pro: "Unlimited" },
+    { icon: BarChart3, label: "Post-game deep analysis", free: "3 / mo", pro: "Unlimited" },
+    { icon: Trophy, label: "Priority matchmaking", free: false, pro: true },
+    { icon: Palette, label: "All board themes + Diamond CEO skin", free: false, pro: true },
+    { icon: Check, label: "Ad-free + CSV export", free: true, pro: true },
   ];
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg glass-strong border-gold/30">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
-            <Crown className="h-6 w-6 text-gold" /> Go Pro
+            <Crown className="h-6 w-6 text-gold" />
+            <span>
+              Go <span className="text-gradient-gold">Pro</span>
+            </span>
           </DialogTitle>
         </DialogHeader>
-        <div className="text-sm text-muted-foreground -mt-2">
-          Unlock the executive suite. <span className="text-gold font-semibold">$4.99 / mo</span>
+
+        <div className="rounded-xl glass-gold p-4 flex items-center justify-between">
+          <div>
+            <div className="text-xs uppercase tracking-wider text-muted-foreground">Boardroom Pass</div>
+            <div className="text-3xl font-extrabold text-gradient-gold">$4.99<span className="text-base text-muted-foreground font-normal">/mo</span></div>
+            <div className="text-[10px] text-muted-foreground mt-0.5">or $39/yr · save 35%</div>
+          </div>
+          <div className="text-right">
+            <div className="inline-flex items-center gap-1 rounded-full bg-gold/15 text-gold px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider">
+              <Sparkles className="h-3 w-3" /> 7-day trial
+            </div>
+          </div>
         </div>
-        <table className="w-full text-sm mt-2">
-          <thead>
-            <tr className="text-xs uppercase text-muted-foreground border-b border-border">
-              <th className="text-left py-2">Feature</th>
-              <th className="py-2">Free</th>
-              <th className="py-2 text-gold">Pro</th>
-            </tr>
-          </thead>
-          <tbody>
-            {features.map((f) => (
-              <tr key={f.label} className="border-b border-border/50">
-                <td className="py-2">{f.label}</td>
-                <td className="text-center py-2">
-                  {typeof f.free === "boolean" ? f.free ? <Check className="h-4 w-4 inline text-green-500" /> : <X className="h-4 w-4 inline text-muted-foreground" /> : <span className="text-xs">{f.free}</span>}
-                </td>
-                <td className="text-center py-2">
-                  {typeof f.pro === "boolean" ? f.pro ? <Check className="h-4 w-4 inline text-gold" /> : <X className="h-4 w-4 inline text-muted-foreground" /> : <span className="text-xs text-gold">{f.pro}</span>}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+
+        <div className="space-y-2 mt-2">
+          {features.map((f) => {
+            const Icon = f.icon;
+            return (
+              <div key={f.label} className="flex items-center gap-3 text-sm border-b border-border/50 pb-2">
+                <Icon className="h-4 w-4 text-gold flex-shrink-0" />
+                <span className="flex-1">{f.label}</span>
+                <span className="text-xs text-muted-foreground w-16 text-center">
+                  {typeof f.free === "boolean" ? (f.free ? <Check className="h-3 w-3 inline text-success" /> : <X className="h-3 w-3 inline" />) : f.free}
+                </span>
+                <span className="text-xs text-gold font-semibold w-20 text-center">
+                  {typeof f.pro === "boolean" ? (f.pro ? <Check className="h-3 w-3 inline" /> : <X className="h-3 w-3 inline" />) : f.pro}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+
         <Button
-          className="w-full mt-2 font-semibold"
-          onClick={() => toast.info("Stripe checkout coming soon — sales@corporatesharks.chess")}
+          className="w-full mt-3 font-semibold glow-gold-strong h-11"
+          onClick={() => toast.info("Payments coming soon — sales@richchess.app", { description: "We're finalizing Stripe integration." })}
         >
-          <Crown className="h-4 w-4 mr-2" /> Subscribe — $4.99 / mo
+          <Crown className="h-4 w-4 mr-2" /> Start 7-day free trial
         </Button>
-        <p className="text-[10px] text-muted-foreground text-center">Cancel anytime. Pro applies to the workspace owner.</p>
+        <p className="text-[10px] text-muted-foreground text-center">Cancel anytime. No charge during trial.</p>
       </DialogContent>
     </Dialog>
   );
