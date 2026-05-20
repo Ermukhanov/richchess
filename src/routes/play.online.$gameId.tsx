@@ -163,6 +163,9 @@ function OnlineGame() {
 
   return (
     <AppShell>
+      {color && (color as string) !== "spectator" && (
+        <LiveCoach chess={chess} fen={fen} history={history} playerColor={color as "w" | "b"} enabled={!over} />
+      )}
       <div className="max-w-6xl mx-auto p-4 md:p-8">
         <div className="flex items-center justify-between mb-4">
           <Button asChild variant="ghost" size="sm">
