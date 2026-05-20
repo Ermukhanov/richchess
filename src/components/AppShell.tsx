@@ -1,5 +1,5 @@
 import { Link, useRouterState, useNavigate } from "@tanstack/react-router";
-import { Home, Swords, BookOpen, Trophy, Users, User, Settings, Crown, LogOut, Briefcase } from "lucide-react";
+import { Home, Swords, BookOpen, Trophy, Users, User, Settings, Crown, LogOut, BarChart3 } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import { useAuth } from "@/lib/auth";
 import { useI18n } from "@/lib/i18n";
@@ -18,6 +18,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     { to: "/dashboard", label: t("home"), icon: Home },
     { to: "/play", label: t("play"), icon: Swords },
     { to: "/learn", label: t("learn"), icon: BookOpen },
+    { to: "/analytics", label: t("analytics"), icon: BarChart3 },
     { to: "/leaderboard", label: t("leaderboard"), icon: Trophy },
     { to: "/community", label: t("community"), icon: Users },
     { to: "/profile", label: t("profile"), icon: User },
@@ -32,15 +33,17 @@ export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen w-full">
       {/* Desktop sidebar */}
-      <aside className="hidden md:flex flex-col w-64 bg-sidebar border-r border-sidebar-border p-4">
-        <Link to="/dashboard" className="flex items-center gap-2 mb-8 px-2">
+      <aside className="hidden md:flex flex-col w-64 glass border-r border-sidebar-border p-4 sticky top-0 h-screen">
+        <Link to="/dashboard" className="flex items-center gap-2 mb-8 px-2 group">
           <div className="relative">
-            <Briefcase className="h-7 w-7 text-gold" />
-            <Crown className="h-3 w-3 text-gold absolute -top-1 -right-1" />
+            <Crown className="h-7 w-7 text-gold transition-transform group-hover:scale-110" strokeWidth={1.6} />
+            <span className="absolute -top-1 -right-1 h-2 w-2 rounded-full bg-gold animate-pulse" />
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-bold text-gradient-gold">Corporate Sharks</span>
-            <span className="text-[10px] uppercase tracking-wider text-muted-foreground">Chess</span>
+            <span className="text-base font-extrabold tracking-tight">
+              <span className="text-gradient-gold">Rich</span>Chess
+            </span>
+            <span className="text-[9px] uppercase tracking-[0.2em] text-muted-foreground">Boardroom Edition</span>
           </div>
         </Link>
 
@@ -53,10 +56,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 key={item.to}
                 to={item.to}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all",
                   active
                     ? "bg-primary text-primary-foreground glow-gold"
-                    : "text-sidebar-foreground hover:bg-card",
+                    : "text-sidebar-foreground hover:bg-white/5 hover:translate-x-0.5",
                 )}
               >
                 <Icon className="h-4 w-4" />
@@ -67,15 +70,23 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
 
         <div className="mt-4 space-y-2">
-          <Button variant="default" className="w-full font-semibold" onClick={() => setProOpen(true)}>
-            <Crown className="h-4 w-4 mr-2" /> {t("goPro")}
-          </Button>
+          {profile && !profile.is_pro && (
+            <Button variant="default" className="w-full font-semibold glow-gold" onClick={() => setProOpen(true)}>
+              <Crown className="h-4 w-4 mr-2" /> {t("goPro")}
+            </Button>
+          )}
           {profile && (
-            <div className="rounded-md bg-card p-3 text-xs">
-              <div className="font-semibold truncate">{profile.username ?? profile.email}</div>
-              <div className="text-gold font-mono mt-1">
-                ${profile.corporate_budget.toLocaleString()} CB
+            <div className="glass-gold rounded-xl p-3 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="h-7 w-7 rounded-full bg-gradient-to-br from-gold to-yellow-700 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
+                  {(profile.username ?? profile.email ?? "U")[0].toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold truncate">{profile.username ?? profile.email}</div>
+                  {profile.is_pro && <div className="text-[9px] text-gold uppercase tracking-wider">Pro Member</div>}
+                </div>
               </div>
+              <div className="text-gold font-mono mt-2">${profile.corporate_budget.toLocaleString()} CB</div>
               <div className="text-muted-foreground mt-0.5">ELO {profile.elo_rating}</div>
               <button onClick={handleSignOut} className="mt-2 flex items-center gap-1 text-muted-foreground hover:text-foreground">
                 <LogOut className="h-3 w-3" /> {t("logout")}
@@ -85,10 +96,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="flex-1 pb-20 md:pb-0">{children}</main>
+      <main className="flex-1 pb-20 md:pb-0 min-w-0">{children}</main>
 
       {/* Mobile bottom nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-sidebar border-t border-sidebar-border flex justify-around py-2">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 glass-strong border-t border-sidebar-border flex justify-around py-2">
         {nav.slice(0, 5).map((item) => {
           const active = path === item.to || path.startsWith(item.to + "/");
           const Icon = item.icon;
