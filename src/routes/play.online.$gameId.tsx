@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ChessGame } from "@/components/ChessGame";
 import { ChessClock, parseTimeControl } from "@/components/ChessClock";
 import { ChatPanel } from "@/components/ChatPanel";
+import { LiveCoach } from "@/components/LiveCoach";
 import { useI18n } from "@/lib/i18n";
 import { useRequireAuth } from "@/lib/useRequireAuth";
 import { sanToCorporate } from "@/lib/pieces";
