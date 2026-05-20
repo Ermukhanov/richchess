@@ -154,6 +154,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_games_today: number
           avatar_url: string | null
           best_win_streak: number
           board_theme: string
@@ -170,6 +171,7 @@ export type Database = {
           id: string
           is_pro: boolean
           language: string
+          last_ai_game_date: string | null
           last_login_date: string | null
           lessons_completed: Json
           losses: number
@@ -183,6 +185,7 @@ export type Database = {
           xp: number
         }
         Insert: {
+          ai_games_today?: number
           avatar_url?: string | null
           best_win_streak?: number
           board_theme?: string
@@ -199,6 +202,7 @@ export type Database = {
           id: string
           is_pro?: boolean
           language?: string
+          last_ai_game_date?: string | null
           last_login_date?: string | null
           lessons_completed?: Json
           losses?: number
@@ -212,6 +216,7 @@ export type Database = {
           xp?: number
         }
         Update: {
+          ai_games_today?: number
           avatar_url?: string | null
           best_win_streak?: number
           board_theme?: string
@@ -228,6 +233,7 @@ export type Database = {
           id?: string
           is_pro?: boolean
           language?: string
+          last_ai_game_date?: string | null
           last_login_date?: string | null
           lessons_completed?: Json
           losses?: number
@@ -247,6 +253,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      consume_ai_game: { Args: { p_limit: number }; Returns: Json }
       place_bet: { Args: { p_amount: number }; Returns: boolean }
       settle_game: {
         Args: { p_bet: number; p_elo_delta: number; p_result: string }
